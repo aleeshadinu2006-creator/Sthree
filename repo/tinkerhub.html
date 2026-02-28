@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>STHREE - Women Legal Rights Assistant</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #ff9ecf, #fbc2eb);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    transition: 0.4s;
+}
+
+.dark-mode {
+    background: linear-gradient(135deg, #1e1e2f, #2c2c54);
+}
+
+.chat-container {
+    width: 420px;
+    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.9);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dark-mode .chat-container {
+    background: rgba(40,40,60,0.95);
+    color: black
+}
+
+.header {
+    background: linear-gradient(to right, #d63384, #ff4da6);
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    position: relative;
+}
+
+.toggle-btn, .exit-btn {
+    position: absolute;
+    top: 15px;
+    border: none;
+    border-radius: 50%;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+.toggle-btn { right: 15px; background: white; color: #d63384; }
+.exit-btn { left: 15px; background: red; color: white; }
+
+.chat-box {
+    padding: 15px;
+    height: 360px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.bot-message, .user-message {
+    padding: 10px 14px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    max-width: 75%;
+}
+
+.bot-message {
+    background: #f8d7f5;
+    align-self: flex-start;
+}
+
+.user-message {
+    background: #d63384;
+    color: white;
+    align-self: flex-end;
+}
+
+.input-area {
+    display: flex;
+    padding: 10px;
+}
+
+input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-left: 8px;
+    padding: 10px;
+    border: none;
+    background: #d63384;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.menu-buttons {
+    padding: 8px;
+    text-align: center;
+}
+
+.menu-buttons button {
+    margin: 3px;
+    font-size: 12px;
+}
+
+.emergency {
+    background: #ffe6f2;
+    padding: 8px;
+    text-align: center;
+    color: red;
+    font-weight: bold;
+}
+
+.sos-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="chat-container">
+    <div class="header">
+        <button class="exit-btn" onclick="quickExit()">🔐</button>
+        🌸 STHREE
+        <button class="toggle-btn" onclick="toggleDark()">🌙</button>
+    </div>
+
+    <div id="chat-box" class="chat-box">
+        <div class="bot-message">
+            Hello 💜 Ask me about women's legal rights in India.
+        </div>
+    </div>
+
+    <div class="menu-buttons">
+        <button onclick="quickSend('domestic violence')">Domestic Violence</button>
+        <button onclick="quickSend('harassment')">Harassment</button>
+        <button onclick="quickSend('dowry')">Dowry</button>
+        <button onclick="quickSend('rape')">Rape</button>
+        <button onclick="quickSend('acid attack')">Acid Attack</button>
+        <button onclick="quickSend('cyber harassment')">Cyber Harassment</button>
+        <button onclick="quickSend('property')">Property</button>
+        <button onclick="quickSend('marital rape')">Maritial rape</button>
+        <button onclick="quickSend('helpline')">Helpline</button>
+        <button onclick="getLocation()">Nearby Help</button>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="Type your question..." onkeypress="handleEnter(event)">
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="startListening()">🎤</button>
+    </div>
+
+    <div style="text-align:center; padding:5px;">
+        Rate Us:
+        <span onclick="rate(1)">⭐</span>
+        <span onclick="rate(2)">⭐</span>
+        <span onclick="rate(3)">⭐</span>
+        <span onclick="rate(4)">⭐</span>
+        <span onclick="rate(5)">⭐</span>
+    </div>
+
+    <div class="emergency">
+        🚨 Women Helpline: 1091 | Emergency: 112 | Cyber Crime: 1930
+    </div>
+</div>
+
+<button class="sos-btn" onclick="showSOS()">🚨</button>
+
+<script>
+
+window.onload = function() {
+    let saved = localStorage.getItem("sthreeChat");
+    if (saved) document.getElementById("chat-box").innerHTML = saved;
+};
+
+const responses = {
+"domestic violence":
+    "Under the Protection of Women from Domestic Violence Act (2005), women are protected from physical, emotional, verbal and economic abuse.",
+
+ "harassment":
+    "Under the Sexual Harassment of Women at Workplace Act (2013), women can file complaints through the Internal Complaints Committee (ICC).",
+
+  "dowry":
+    "Under the Dowry Prohibition Act (1961), giving or taking dowry is illegal in India.",
+
+   "rape":
+     "under Section 376 of the Indian Penal code (ipc), rape is a serious criminal offense punishable with rigorous imprisonoment.survivors have the right to free medical treatment and    legal support under Indian Law.",
+
+   "acid attack":
+     "under sections 326A and 326B of the IPC, acid attack is a punishable offense with severe imprisonment and fine.surviors and entitled to free medical treatment and government compensation.",
+
+    "cyber harassment":
+    "under he IT ACT (2000) and IPC, cyber harassment and online stalking are punishable ofenses. report at https://www.cybercrime.gov.on.",
+
+     "marital rape":
+       "forced sexual intercourse by a husband may fall under domestic violence laws.while  marital rape is not fully criminalized in all situations under IPC,women can seek protection and releif under a protection of women from domestic violence Act(2005).",
+      
+     "property":
+    "Under the Hindu Succession Act (1956), daughters have equal rights to ancestral property.",
+   
+      "helpline":
+    "🚨 Women Helpline: 1091 | Emergency: 112"
+
+};
+
+function sendMessage() {
+    let input = document.getElementById("user-input");
+    let userInput = input.value.toLowerCase();
+    if (userInput.trim() === "") return;
+
+    appendMessage(userInput, "user-message");
+
+    let found = false;
+    for (let key in responses) {
+        if (userInput.includes(key)) {
+            typingEffect(responses[key]);
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) typingEffect("Sorry, I don't understand.");
+
+    input.value = "";
+}
+
+function quickSend(text) {
+    appendMessage(text, "user-message");
+    typingEffect(responses[text]);
+}
+
+function appendMessage(text, className) {
+    let chatBox = document.getElementById("chat-box");
+    let div = document.createElement("div");
+    div.className = className;
+    div.innerHTML = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    localStorage.setItem("sthreeChat", chatBox.innerHTML);
+}
+
+function typingEffect(text) {
+    let chatBox = document.getElementById("chat-box");
+    let div = document.createElement("div");
+    div.className = "bot-message";
+    chatBox.appendChild(div);
+
+    let i = 0;
+    function type() {
+        if (i < text.length) {
+            div.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, 20);
+        }
+    }
+    type();
+}
+
+function toggleDark() {
+    document.body.classList.toggle("dark-mode");
+}
+
+function handleEnter(e) {
+    if (e.key === "Enter") sendMessage();
+}
+
+function quickExit() {
+    window.location.href = "https://www.google.com";
+}
+
+function showSOS() {
+    typingEffect("🚨 Emergency Help:\nWomen Helpline: 1091\nPolice: 112\nCyber Crime: 1930");
+}
+
+function startListening() {
+    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-IN";
+    recognition.start();
+    recognition.onresult = function(event) {
+        document.getElementById("user-input").value =
+        event.results[0][0].transcript;
+        sendMessage();
+    };
+}
+
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(pos) {
+            typingEffect("📍 Location:\nLat: " + pos.coords.latitude +
+            "\nLong: " + pos.coords.longitude);
+        });
+    }
+}
+
+function rate(stars) {
+    typingEffect("Thank you for rating us " + stars + " ⭐");
+}
+
+</script>
+</body>
+</html>
